@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>测试</title>
+	<script src="http://pv.sohu.com/cityjson?ie=utf-8"></script>
+	<script>
+	    var collectObj = {};
+
+		document.addEventListener("DOMContentLoaded", function (event) {
+		  collectObj.DOMContentLoaded = new Date().getTime();
+		});
+		window.addEventListener("load", function (event) {
+            var vpath = document.getElementById('vpath');
+            var videoId = vpath.innerText.split('/')[0];
+            collectObj.videoId = videoId;
+            var titleEle = document.getElementsByTagName('h1')[0];
+            collectObj.videoTitle = titleEle.innerText;
+		  collectObj.load = new Date().getTime();
+
+		  // 获取ip
+		  collectObj.ip = returnCitySN["cip"];
+
+		  // 获取video
+		  var video = document.getElementById('video');
+			addVideoListener(video,"loadstart"); //客户端开始请求数据
+			addVideoListener(video,"progress"); //客户端正在请求数据
+			addVideoListener(video,"suspend"); //延迟下载
+			addVideoListener(video,"abort"); //客户端主动终止下载（不是因为错误引起）
+			addVideoListener(video,"loadstart"); //客户端开始请求数据
+			addVideoListener(video,"progress"); //客户端正在请求数据
+			addVideoListener(video,"suspend"); //延迟下载
+			addVideoListener(video,"abort"); //客户端主动终止下载（不是因为错误引起），
+			addVideoListener(video,"error"); //请求数据时遇到错误
+			addVideoListener(video,"stalled"); //网速失速
+			addVideoListener(video,"play"); //play()和autoplay开始播放时触发
+			addVideoListener(video,"pause"); //pause()触发
+			addVideoListener(video,"loadedmetadata"); //成功获取资源长度
+			addVideoListener(video,"loadeddata"); //
+			addVideoListener(video,"waiting"); //等待数据，并非错误
+			addVideoListener(video,"playing"); //开始回放
+			addVideoListener(video,"canplay"); //可以播放，但中途可能因为加载而暂停
+			addVideoListener(video,"canplaythrough"); //可以播放，歌曲全部加载完毕
+			addVideoListener(video,"seeking"); //寻找中
+			addVideoListener(video,"seeked"); //寻找完毕
+			addVideoListener(video,"timeupdate"); //播放时间改变
+			addVideoListener(video,"ended"); //播放结束
+			addVideoListener(video,"ratechange"); //播放速率改变
+			//addVideoListener(video,"durationchange"); //资源长度改变
+			//addVideoListener(video,"volumechange"); //音量改变
+
+		});
+
+		function addVideoListener(video,type){
+			video.addEventListener(type,function(event){
+				console.log(video.currentTime + "_" + video.duration);
+				collectObj[type + "_" + new Date().getTime()] = video.currentTime + "_" + video.duration;
+			});
+		}
+		document.onreadystatechange = function () {
+			  collectObj[document.readyState] = new Date().getTime();
+		}
+		window.addEventListener("beforeunload", function (event) {
+		  collectObj.beforeunload = new Date().getTime();
+		});
+		window.addEventListener('unload', function (event) {
+            console.log('unload');
+            collectObj.unload = new Date().getTime();
+		  sendMsg();
+		});
+
+		//请求服务器
+		function sendMsg(){
+            var xmlHttp = new XMLHttpRequest();
+			var data = JSON.stringify(collectObj);
+            xmlHttp.open("get", "http://127.0.0.1:8000/collect?data=" + data,false); 
+            xmlHttp.send();
+		}
+	</script>
+</head>
+
+
+<body>
+    <video id="video"
+        src="https://vd2.bdstatic.com/mda-jf9e9p43h14zwvrb/sc/mda-jf9e9p43h14zwvrb.mp4?auth_key=1563183067-0-0-6e5f8004303ace42a35ff616815626bb&bcevod_channel=searchbox_feed&pd=bjh&abtest=all"
+        controls width='600' autoplay></video>
+</body>
+
+</html>

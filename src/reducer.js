@@ -1,6 +1,7 @@
 import * as ActionType from './ActionTypes'
 export default (state, action) => {
     const { counterCaption } = action;
+    console.log(action);
     switch (action.type) {
         case ActionType.INCREMENT:
             return { ...state,[counterCaption]: state[counterCaption]+1};

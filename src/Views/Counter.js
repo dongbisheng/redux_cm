@@ -1,38 +1,57 @@
 import React from 'react';
-import PropType from 'prop-types';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import * as Actions from '../Action'
 
-class Counter extends React.Component{
-    render() {
-        const countStyle = {
-            counter: {
-                margin: 10
-            },
-            title: {
-                marginRight: 10,
-                color: '#F2C211'
-            },
-            button: {
+function Counter({caption,onIncrease,onDecrease,value}) {
+    const countStyle = {
+        counter: {
+            margin: 10
+        },
+        title: {
+            marginRight: 10,
+            color: '#F2C211'
+        },
+        button: {
 
-            },
-            content: {
-                marginLeft: 10,
-                marginRight: 10
-            }
+        },
+        content: {
+            marginLeft: 10,
+            marginRight: 10
         }
-        return (
-            <div className='counter' style={countStyle.counter}>
-                <span style={countStyle.title}>{this.props.caption}</span>
-                <button onClick={()=>{this.props.handleCount(false)}}>-</button>
-                <span style={countStyle.content}>{this.props.value}</span>
-                <button onClick={()=>{this.props.handleCount(true)}}>+</button>
-            </div>
-        );
-    }
+    };
+    return (
+        <div className='counter' style={countStyle.counter}>
+            <span style={countStyle.title}>{caption}</span>
+            <button onClick={onDecrease}>-</button>
+            <span style={countStyle.content}>{value}</span>
+            <button onClick={onIncrease}>+</button>
+        </div>
+    );
 }
 
 Counter.propTypes = {
-    caption: PropType.string.isRequired,
-    initValue: PropType.number,
+    caption: PropTypes.string.isRequired,
+    initValue: PropTypes.number,
+    onIncrease: PropTypes.func.isRequired,
+    onDecrease: PropTypes.func.isRequired
+};
+
+function mapState(state, ownProp) {
+    return {
+        value: state[ownProp.caption]
+    }
 }
 
-export default Counter;
+function mapDispatchToProps(dispatch, ownProps) {
+    return {
+        onIncrease: () => {
+            dispatch(Actions.increment(ownProps.caption))
+        },
+        onDecrease: () => {
+            dispatch(Actions.decrement(ownProps.caption))
+        }
+    }
+}
+
+export default connect(mapState,mapDispatchToProps)(Counter);
